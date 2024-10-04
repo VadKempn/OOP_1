@@ -2,10 +2,11 @@
 
 public class Train
 {
-    public double Weight { get; private set; }
+    public double Weight { get; set; }
     public double Speed { get; private set; }
-    public double Boost { get; private set; }
-    public double MaxPermissibleForce { get; private set; }
+    public double Boost { get; set; }
+    public double MaxPermissibleForce { get; set; }
+
 
     public Train(double weight, double maxPermissibleForce, double startValueOfSpeed = 0, double startValueOfBoost = 0)
     {
@@ -13,35 +14,30 @@ public class Train
         MaxPermissibleForce = maxPermissibleForce;
         Speed = startValueOfSpeed;
         Boost = startValueOfBoost;
-
     }
 
-    public bool AppliedForce(double forse)
+    public bool TryApplyForce(double force)
     {
-        if (forse > MaxPermissibleForce)
+        if (force > MaxPermissibleForce)
             return false;
 
-        Boost = forse / Weight;
+        Boost = force / Weight;
         return true;
     }
-    
-        
 
-    public double CalculateTravelTime(double distance, double precision, double countTime = 0)
+    public double? CalculateTravelTime(double distance, double precision = 0.1)
     {
-        double time = countTime;
-        double remainingDistance = distance;
+        double time = 0;
+        double passedDistance = 0;
 
-        while (remainingDistance >= 0)
+        while (passedDistance < distance)
         {
             Speed += Boost * precision;
-            double traveled = Speed * precision;
-            remainingDistance -= traveled;
+            passedDistance += Speed * precision;
             time += precision;
 
-            if ((Speed < 0) || (Speed == 0 && Boost == 0))
-                return -1;
-
+            if ((Speed < 0) || (Speed == 0 && Boost <= 0))
+                return null;
         }
 
         return time;

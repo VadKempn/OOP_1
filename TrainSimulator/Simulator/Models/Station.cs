@@ -1,24 +1,25 @@
-﻿namespace OOP_1.Simulator.Models
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace OOP_1.Simulator.Models
 {
     public class Station : RouteSegment
     {
-        private double _limitHighSpeedModuls;
-        
-        public Station(double lenght, double limitHighSpeedModuls) : base(lenght)
+        private readonly double _speedLimit;
+        private readonly double _waitingTime;
+
+        public Station(double speedLimit, double waitingTime)
         {
-            _limitHighSpeedModuls = limitHighSpeedModuls;
+            _speedLimit = speedLimit;
+            _waitingTime = waitingTime;
         }
 
-        public override bool TryPass(Train train, out double time)
+        public override bool TryPass(Train train, [NotNullWhen(true)] out double? time)
         {
-            if (train.Speed > _limitHighSpeedModuls)
-            {
-                time = -1;
-                return false;
-            }
-            time = train.CalculateTravelTime(Length, 0.1) + 1;
-            return time >= 0;
+            ArgumentNullException.ThrowIfNull(train);
+            time = train.Speed > _speedLimit
+                ? null
+                : _waitingTime;
+            return time != null;
         }
-            
     }
 }

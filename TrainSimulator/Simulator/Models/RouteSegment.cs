@@ -1,13 +1,8 @@
-﻿namespace OOP_1.Simulator.Models;
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace OOP_1.Simulator.Models;
 
 public abstract class RouteSegment
 {
-        public double Length { get; }
-
-        protected RouteSegment(double length)
-        {
-            Length = length;
-        }
-
-        public abstract bool TryPass(Train train, out double time);
+    public abstract bool TryPass(Train train, [NotNullWhen(true)] out double? time);
 }

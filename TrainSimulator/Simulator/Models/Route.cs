@@ -1,15 +1,41 @@
-﻿namespace OOP_1.Simulator.Models
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace OOP_1.Simulator.Models;
+
+public class Route
 {
-    public class Route : RouteSegment
+    private readonly IReadOnlyList<RouteSegment> _segments;
+    private readonly double _speedLimit;
+
+    public Route(IEnumerable<RouteSegment> segments, double speedLimit)
     {
-        public Route(double lenght) : base(lenght)
+        ArgumentNullException.ThrowIfNull(segments);
+        _segments = segments.ToList();
+        _speedLimit = speedLimit;
+    }
+
+    public bool TryComplete(Train train,[NotNullWhen(true)] out double? totalTime)
+    {
+        ArgumentNullException.ThrowIfNull(train);
+        
+        totalTime = 0;
+
+        foreach (var segment in _segments)
         {
+            if (!segment.TryPass(train, out var segmentTime))
+            {
+                totalTime = null;
+                return false;
+            }
+
+            totalTime += segmentTime;
         }
 
-        public override bool TryPass(Train train, out double time)
+        if (train.Speed > _speedLimit)
         {
-            time = train.CalculateTravelTime(Length, 0.1);
-            return time >= 0;
+            totalTime = null;
+            return false;
         }
+        return true;
     }
 }
